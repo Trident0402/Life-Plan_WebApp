@@ -243,10 +243,6 @@ table.asset-table { width: 100%; border-collapse: collapse; font-size: 13px; }
 }
 .stmt-card::-webkit-scrollbar { width: 3px; }
 .stmt-card::-webkit-scrollbar-thumb { background: var(--border); }
-.stmt-card h3 {
-    font-size: 13px; font-weight: 700; color: var(--accent);
-    padding-bottom: 10px; border-bottom: 1px solid var(--border2); margin-bottom: 12px;
-}
 .stmt-section { margin-bottom: 12px; }
 .stmt-section-title {
     font-size: 11px; font-weight: 700; color: var(--accent2);
@@ -265,6 +261,15 @@ table.asset-table { width: 100%; border-collapse: collapse; font-size: 13px; }
 .stmt-total-row { display: flex; justify-content: space-between; padding: 6px 0; margin-top: 4px; }
 .stmt-total-row .stmt-label { font-weight: 700; color: var(--text-primary); font-size: 13px; }
 .stmt-total-row .stmt-value { font-size: 15px; }
+
+/* Accordion (Desktop Default) */
+.stmt-accordion-header {
+    cursor: default; padding-bottom: 10px; border-bottom: 1px solid var(--border2);
+    margin-bottom: 12px; font-weight: 700; color: var(--accent); font-size: 13px;
+    display: flex; justify-content: space-between; align-items: center;
+}
+.accordion-arrow { display: none; }
+.stmt-accordion-body { max-height: none !important; overflow: visible; display: block; }
 
 /* ── Score Tab ── */
 .score-layout { display: grid; grid-template-columns: 240px 1fr; gap: 16px; flex: 1; }
@@ -337,8 +342,93 @@ table.asset-table { width: 100%; border-collapse: collapse; font-size: 13px; }
 .toast-error   { background: rgba(239,83,80,0.9);   color: #fff; }
 .toast-info    { background: rgba(79,195,247,0.9);   color: #0d1b2a; }
 
-@media (max-width: 900px) {
+/* ════════════════════════════════════════════════════════
+   📱 手機版專屬優化 (Mobile First Overrides)
+════════════════════════════════════════════════════════ */
+.mobile-tab-bar { display: none; }
+.scroll-indicator { display: none; }
+
+@media (max-width: 900px) and (min-width: 769px) {
     .sidebar { width: 300px; min-width: 300px; }
     .pie-grid, .stmt-grid { grid-template-columns: 1fr; }
     .score-layout { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 768px) {
+    html, body { overflow-x: hidden; overflow-y: auto; }
+    .app-layout { flex-direction: column; height: auto; padding-bottom: 70px; overflow: visible; }
+    
+    /* 底部導覽列 */
+    .mobile-tab-bar {
+        display: flex; position: fixed; bottom: 0; left: 0; right: 0;
+        height: 60px; background: var(--bg-panel); border-top: 1px solid var(--border);
+        z-index: 1000; padding-bottom: env(safe-area-inset-bottom);
+        box-shadow: 0 -2px 10px rgba(0,0,0,0.2);
+    }
+    .mob-tab {
+        flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+        background: transparent; border: none; color: var(--text-muted); cursor: pointer; gap: 4px;
+        -webkit-tap-highlight-color: transparent;
+    }
+    .mob-tab.active { color: var(--accent); }
+    .mob-tab-icon { font-size: 18px; }
+    .mob-tab-label { font-size: 11px; font-weight: 600; }
+
+    /* 全局 View 切換控制 */
+    body.mob-view-input .sidebar { display: flex; width: 100%; min-width: 100%; border-right: none; }
+    body:not(.mob-view-input) .sidebar { display: none; }
+    
+    body.mob-view-input .main-content { display: none; }
+    body:not(.mob-view-input) .main-content { display: flex; width: 100%; overflow: visible; }
+
+    /* 隱藏桌面結果頁籤 */
+    .rtab-nav { display: none; }
+    
+    /* 強制隱藏所有面板，依賴 Body Class 顯示 */
+    .rtab-panel { display: none !important; padding: 12px; }
+    body.mob-view-charts #tab-charts, body.mob-view-charts #tab-pies { display: flex !important; flex-direction: column; gap: 12px; }
+    body.mob-view-reports #tab-table, body.mob-view-reports #tab-stmts { display: flex !important; flex-direction: column; gap: 12px; }
+    body.mob-view-score #tab-score, body.mob-view-score #tab-info { display: flex !important; flex-direction: column; gap: 12px; }
+
+    /* 觸控優化：表單與滑桿 */
+    .form-row { flex-direction: column; align-items: stretch; margin-bottom: 12px; }
+    .form-row label { width: 100%; min-width: 100%; margin-bottom: 6px; font-size: 13px; }
+    input[type=number], input[type=text] { min-height: 44px; font-size: 16px; border-radius: 8px; }
+    .slider-wrap { padding: 14px 0; }
+    input[type=range]::-webkit-slider-thumb { width: 26px; height: 26px; }
+    
+    /* 按鈕優化 */
+    .btn-primary { min-height: 54px; font-size: 16px; margin-top: 10px; }
+    .btn-outline, .btn-success { min-height: 44px; font-size: 14px; }
+    
+    /* 圖表與網格優化 */
+    .pie-grid { grid-template-columns: 1fr; }
+    .pie-card { height: 320px; }
+    .stmt-grid { grid-template-columns: 1fr; }
+    .score-layout { grid-template-columns: 1fr; }
+    .chart-canvas-wrap { height: 240px; }
+    
+    /* 水位表優化 */
+    .table-scroll-hint { position: relative; }
+    .scroll-indicator {
+        display: block; text-align: center; font-size: 11px;
+        color: var(--accent2); margin-bottom: 8px; font-weight: 600;
+        animation: pulse 2s infinite;
+    }
+    @keyframes pulse { 0%,100% { opacity: 0.5; } 50% { opacity: 1; } }
+    .table-wrap { -webkit-overflow-scrolling: touch; overflow-x: auto; border: none; box-shadow: inset -10px 0 10px -10px rgba(0,0,0,0.3); }
+    
+    /* Accordion (Mobile Overrides) */
+    .stmt-card { padding: 0; background: transparent; border: none; }
+    .stmt-accordion-header {
+        cursor: pointer; padding: 16px; background: var(--bg-card2); border-bottom: none;
+        margin-bottom: 0; font-size: 14px; border-radius: var(--radius);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    .accordion-arrow { display: block; color: var(--text-muted); font-size: 12px; }
+    .stmt-accordion-body { max-height: 0 !important; overflow: hidden; padding: 0 16px; transition: max-height 0.35s ease, padding 0.35s ease; background: var(--bg-panel); border-radius: 0 0 var(--radius) var(--radius); margin-top: -4px; }
+    .stmt-accordion-body.open { max-height: 3000px !important; padding: 16px; border: 1px solid var(--border); border-top: none; }
+
+    /* 頂部摘要列固定 */
+    .summary-bar { position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow); font-size: 12px; padding: 12px; }
 }

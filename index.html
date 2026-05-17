@@ -2,14 +2,14 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>人生財務規劃模擬器</title>
 <meta name="description" content="終身財務規劃模擬工具，計算資產、房貸、稅務、退休規劃。">
 <link rel="stylesheet" href="style.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
 </head>
-<body>
+<body class="mob-view-input">
 <div class="app-layout">
 
 <!-- ══════════════════════════════════════════
@@ -229,23 +229,26 @@
 
     <!-- 水位表 -->
     <div class="rtab-panel" id="tab-table">
-      <div class="table-wrap">
-        <table class="asset-table">
-          <thead>
-            <tr>
-              <th>年齡</th>
-              <th>總資產 (萬)</th>
-              <th>投資部位 (萬)</th>
-              <th>現金存款 (萬)</th>
-              <th>當年稅收 (萬)</th>
-              <th>淨現金流 (萬)</th>
-              <th>人生事件備註</th>
-            </tr>
-          </thead>
-          <tbody id="asset-table-body">
-            <tr><td colspan="7" class="center" style="color:var(--text-muted);padding:32px;">請先執行推算</td></tr>
-          </tbody>
-        </table>
+      <div class="table-scroll-hint">
+        <div class="scroll-indicator">← 左右滑動查看完整表格 →</div>
+        <div class="table-wrap">
+          <table class="asset-table">
+            <thead>
+              <tr>
+                <th>年齡</th>
+                <th>總資產 (萬)</th>
+                <th>投資部位 (萬)</th>
+                <th>現金存款 (萬)</th>
+                <th>當年稅收 (萬)</th>
+                <th>淨現金流 (萬)</th>
+                <th>人生事件備註</th>
+              </tr>
+            </thead>
+            <tbody id="asset-table-body">
+              <tr><td colspan="7" class="center" style="color:var(--text-muted);padding:32px;">請先執行推算</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
 
@@ -259,72 +262,87 @@
       <div class="stmt-grid">
         <!-- 資產負債表 -->
         <div class="stmt-card">
-          <h3>🏦 資產負債表</h3>
-          <div class="stmt-section">
-            <div class="stmt-section-title">資產 Assets</div>
-            <div class="stmt-row"><span class="stmt-label">現金與存款</span><span class="stmt-value" id="bs-cash">—</span></div>
-            <div class="stmt-row"><span class="stmt-label">投資部位</span><span class="stmt-value" id="bs-invest">—</span></div>
-            <hr class="stmt-divider">
-            <div class="stmt-total-row"><span class="stmt-label">總資產</span><span class="stmt-value" id="bs-totalA">—</span></div>
+          <div class="stmt-accordion-header">
+            <span>🏦 資產負債表</span>
+            <span class="accordion-arrow">▼</span>
           </div>
-          <div class="stmt-section">
-            <div class="stmt-section-title">負債 Liabilities</div>
-            <div class="stmt-row"><span class="stmt-label">房屋貸款餘額</span><span class="stmt-value" id="bs-mortgage">—</span></div>
-            <div class="stmt-row"><span class="stmt-label">汽車貸款餘額</span><span class="stmt-value" id="bs-car">—</span></div>
-            <div class="stmt-row"><span class="stmt-label">一般債務餘額</span><span class="stmt-value" id="bs-debt">—</span></div>
-            <hr class="stmt-divider">
-            <div class="stmt-total-row"><span class="stmt-label">總負債</span><span class="stmt-value" id="bs-totalL">—</span></div>
-          </div>
-          <div class="stmt-section">
-            <div class="stmt-section-title">淨值 Net Worth</div>
-            <div class="stmt-total-row"><span class="stmt-label">總淨值</span><span class="stmt-value positive" id="bs-netWorth">—</span></div>
+          <div class="stmt-accordion-body open">
+            <div class="stmt-section">
+              <div class="stmt-section-title">資產 Assets</div>
+              <div class="stmt-row"><span class="stmt-label">現金與存款</span><span class="stmt-value" id="bs-cash">—</span></div>
+              <div class="stmt-row"><span class="stmt-label">投資部位</span><span class="stmt-value" id="bs-invest">—</span></div>
+              <hr class="stmt-divider">
+              <div class="stmt-total-row"><span class="stmt-label">總資產</span><span class="stmt-value" id="bs-totalA">—</span></div>
+            </div>
+            <div class="stmt-section">
+              <div class="stmt-section-title">負債 Liabilities</div>
+              <div class="stmt-row"><span class="stmt-label">房屋貸款餘額</span><span class="stmt-value" id="bs-mortgage">—</span></div>
+              <div class="stmt-row"><span class="stmt-label">汽車貸款餘額</span><span class="stmt-value" id="bs-car">—</span></div>
+              <div class="stmt-row"><span class="stmt-label">一般債務餘額</span><span class="stmt-value" id="bs-debt">—</span></div>
+              <hr class="stmt-divider">
+              <div class="stmt-total-row"><span class="stmt-label">總負債</span><span class="stmt-value" id="bs-totalL">—</span></div>
+            </div>
+            <div class="stmt-section">
+              <div class="stmt-section-title">淨值 Net Worth</div>
+              <div class="stmt-total-row"><span class="stmt-label">總淨值</span><span class="stmt-value positive" id="bs-netWorth">—</span></div>
+            </div>
           </div>
         </div>
         <!-- 損益表 -->
         <div class="stmt-card">
-          <h3>📊 損益表</h3>
-          <div class="stmt-section">
-            <div class="stmt-section-title">收入 Revenue</div>
-            <div class="stmt-row"><span class="stmt-label">年度薪資/年終</span><span class="stmt-value" id="is-income">—</span></div>
+          <div class="stmt-accordion-header">
+            <span>📊 損益表</span>
+            <span class="accordion-arrow">▼</span>
           </div>
-          <div class="stmt-section">
-            <div class="stmt-section-title">支出 Expenses</div>
-            <div class="stmt-row"><span class="stmt-label">基本生活費</span><span class="stmt-value" id="is-living">—</span></div>
-            <div class="stmt-row"><span class="stmt-label">年度旅遊費</span><span class="stmt-value" id="is-travel">—</span></div>
-            <div class="stmt-row"><span class="stmt-label">房貸本息支出</span><span class="stmt-value" id="is-mortgage">—</span></div>
-            <div class="stmt-row"><span class="stmt-label">車貸本息支出</span><span class="stmt-value" id="is-car">—</span></div>
-            <div class="stmt-row"><span class="stmt-label">債務本息支出</span><span class="stmt-value" id="is-debt">—</span></div>
-            <div class="stmt-row"><span class="stmt-label">所得稅支出</span><span class="stmt-value" id="is-tax">—</span></div>
-            <div class="stmt-row"><span class="stmt-label">重大/自訂消費</span><span class="stmt-value" id="is-custom">—</span></div>
-            <div class="stmt-row"><span class="stmt-label">單次重大事件</span><span class="stmt-value" id="is-event">—</span></div>
-            <hr class="stmt-divider">
-            <div class="stmt-total-row"><span class="stmt-label">總支出</span><span class="stmt-value" id="is-totalExp">—</span></div>
-          </div>
-          <div class="stmt-section">
-            <div class="stmt-section-title">淨利 Net Income</div>
-            <div class="stmt-total-row"><span class="stmt-label">本期淨利</span><span class="stmt-value positive" id="is-netIncome">—</span></div>
+          <div class="stmt-accordion-body open">
+            <div class="stmt-section">
+              <div class="stmt-section-title">收入 Revenue</div>
+              <div class="stmt-row"><span class="stmt-label">年度薪資/年終</span><span class="stmt-value" id="is-income">—</span></div>
+            </div>
+            <div class="stmt-section">
+              <div class="stmt-section-title">支出 Expenses</div>
+              <div class="stmt-row"><span class="stmt-label">基本生活費</span><span class="stmt-value" id="is-living">—</span></div>
+              <div class="stmt-row"><span class="stmt-label">年度旅遊費</span><span class="stmt-value" id="is-travel">—</span></div>
+              <div class="stmt-row"><span class="stmt-label">房貸本息支出</span><span class="stmt-value" id="is-mortgage">—</span></div>
+              <div class="stmt-row"><span class="stmt-label">車貸本息支出</span><span class="stmt-value" id="is-car">—</span></div>
+              <div class="stmt-row"><span class="stmt-label">債務本息支出</span><span class="stmt-value" id="is-debt">—</span></div>
+              <div class="stmt-row"><span class="stmt-label">所得稅支出</span><span class="stmt-value" id="is-tax">—</span></div>
+              <div class="stmt-row"><span class="stmt-label">重大/自訂消費</span><span class="stmt-value" id="is-custom">—</span></div>
+              <div class="stmt-row"><span class="stmt-label">單次重大事件</span><span class="stmt-value" id="is-event">—</span></div>
+              <hr class="stmt-divider">
+              <div class="stmt-total-row"><span class="stmt-label">總支出</span><span class="stmt-value" id="is-totalExp">—</span></div>
+            </div>
+            <div class="stmt-section">
+              <div class="stmt-section-title">淨利 Net Income</div>
+              <div class="stmt-total-row"><span class="stmt-label">本期淨利</span><span class="stmt-value positive" id="is-netIncome">—</span></div>
+            </div>
           </div>
         </div>
         <!-- 現金流量表 -->
         <div class="stmt-card">
-          <h3>💧 現金流量表</h3>
-          <div class="stmt-section">
-            <div class="stmt-section-title">營業活動現金流</div>
-            <div class="stmt-row"><span class="stmt-label">本期淨利</span><span class="stmt-value" id="cf-netIncome">—</span></div>
+          <div class="stmt-accordion-header">
+            <span>💧 現金流量表</span>
+            <span class="accordion-arrow">▼</span>
           </div>
-          <div class="stmt-section">
-            <div class="stmt-section-title">投資活動現金流</div>
-            <div class="stmt-row"><span class="stmt-label">投資組合收益</span><span class="stmt-value" id="cf-invGain">—</span></div>
-            <div class="stmt-row"><span class="stmt-label">(由系統比例自動分配)</span><span class="stmt-value">—</span></div>
-          </div>
-          <div class="stmt-section">
-            <div class="stmt-section-title">期末餘額</div>
-            <div class="stmt-row"><span class="stmt-label">現金部位餘額</span><span class="stmt-value" id="cf-cashEnd">—</span></div>
-            <div class="stmt-row"><span class="stmt-label">投資部位餘額</span><span class="stmt-value" id="cf-investEnd">—</span></div>
-          </div>
-          <div class="stmt-section">
-            <div class="stmt-section-title">說明備註</div>
-            <div style="font-size:13px;color:var(--text-secondary);padding:8px;background:var(--bg-card);border-radius:6px;line-height:1.6;" id="cf-note">—</div>
+          <div class="stmt-accordion-body open">
+            <div class="stmt-section">
+              <div class="stmt-section-title">營業活動現金流</div>
+              <div class="stmt-row"><span class="stmt-label">本期淨利</span><span class="stmt-value" id="cf-netIncome">—</span></div>
+            </div>
+            <div class="stmt-section">
+              <div class="stmt-section-title">投資活動現金流</div>
+              <div class="stmt-row"><span class="stmt-label">投資組合收益</span><span class="stmt-value" id="cf-invGain">—</span></div>
+              <div class="stmt-row"><span class="stmt-label">(由系統比例自動分配)</span><span class="stmt-value">—</span></div>
+            </div>
+            <div class="stmt-section">
+              <div class="stmt-section-title">期末餘額</div>
+              <div class="stmt-row"><span class="stmt-label">現金部位餘額</span><span class="stmt-value" id="cf-cashEnd">—</span></div>
+              <div class="stmt-row"><span class="stmt-label">投資部位餘額</span><span class="stmt-value" id="cf-investEnd">—</span></div>
+            </div>
+            <div class="stmt-section">
+              <div class="stmt-section-title">說明備註</div>
+              <div style="font-size:13px;color:var(--text-secondary);padding:8px;background:var(--bg-card);border-radius:6px;line-height:1.6;" id="cf-note">—</div>
+            </div>
           </div>
         </div>
       </div>
@@ -383,6 +401,26 @@
 </main>
 
 </div><!-- /app-layout -->
+
+<!-- 手機專屬底部導覽列 -->
+<nav class="mobile-tab-bar" id="mobile-tab-bar">
+  <button class="mob-tab active" data-view="mob-view-input">
+    <span class="mob-tab-icon">📝</span>
+    <span class="mob-tab-label">輸入</span>
+  </button>
+  <button class="mob-tab" data-view="mob-view-charts">
+    <span class="mob-tab-icon">📊</span>
+    <span class="mob-tab-label">圖表</span>
+  </button>
+  <button class="mob-tab" data-view="mob-view-reports">
+    <span class="mob-tab-icon">📋</span>
+    <span class="mob-tab-label">報表</span>
+  </button>
+  <button class="mob-tab" data-view="mob-view-score">
+    <span class="mob-tab-icon">🏆</span>
+    <span class="mob-tab-label">評分</span>
+  </button>
+</nav>
 
 <!-- 所有 JS 同目錄 -->
 <script src="engine.js"></script>

@@ -13,6 +13,7 @@ const numVal  = id => parseFloat($(id).value) || 0;
 const intVal  = id => parseInt($(id).value)   || 0;
 const strVal  = id => $(id).value.trim();
 const fmtWan  = v  => (v / 10000).toFixed(1);
+const isMobile = () => window.innerWidth <= 768;
 
 // ─────────────────────────────────────────────────
 //  Slider sync
@@ -27,10 +28,10 @@ function bindSliders() {
 }
 
 // ─────────────────────────────────────────────────
-//  Tab navigation
+//  Tab navigation (Desktop) & Mobile Navigation
 // ─────────────────────────────────────────────────
 function initTabs() {
-    // 左側參數分頁
+    // 左側參數分頁 (Desktop + Mobile 共通)
     document.querySelectorAll('.ptab-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             document.querySelectorAll('.ptab-btn').forEach(b => b.classList.remove('active'));
@@ -40,7 +41,7 @@ function initTabs() {
         });
     });
 
-    // 右側結果分頁
+    // 右側結果分頁 (Desktop 專用)
     document.querySelectorAll('.rtab-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             document.querySelectorAll('.rtab-btn').forEach(b => b.classList.remove('active'));
@@ -50,6 +51,48 @@ function initTabs() {
 
             // 觸發圖表 resize
             if (btn.dataset.target === 'tab-charts' && simResults.length) renderMainCharts(simResults);
+        });
+    });
+}
+
+function initMobileNavigation() {
+    // 預設為輸入視圖 (如果沒有的話)
+    if (!document.body.className.includes('mob-view-')) {
+        document.body.classList.add('mob-view-input');
+    }
+
+    // 綁定底部導覽按鈕
+    document.querySelectorAll('.mob-tab').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.mob-tab').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            // 清除所有的 mobile view class
+            document.body.classList.remove('mob-view-input', 'mob-view-charts', 'mob-view-reports', 'mob-view-score');
+            const viewId = btn.dataset.view;
+            document.body.classList.add(viewId);
+            
+            // 如果切換到圖表，觸發重繪確保自適應
+            if (viewId === 'mob-view-charts' && simResults.length) {
+                setTimeout(() => { renderMainCharts(simResults); }, 50);
+            }
+            
+            // 捲動到頂部
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    });
+}
+
+function initAccordion() {
+    document.querySelectorAll('.stmt-accordion-header').forEach(header => {
+        header.addEventListener('click', () => {
+            // 在桌面版不啟用折疊功能（CSS 已隱藏箭頭並鎖死高度）
+            if (!isMobile()) return;
+            
+            const body = header.nextElementSibling;
+            const isOpen = body.classList.toggle('open');
+            const arrow = header.querySelector('.accordion-arrow');
+            if (arrow) arrow.textContent = isOpen ? '▲' : '▼';
         });
     });
 }
@@ -210,6 +253,19 @@ function runSimulation() {
             renderScorePanel(lastScore);
 
             showToast('✅ 推算完成！', 'success');
+
+            // 📱 手機版：推算完成後自動跳轉到圖表分析視圖
+            if (isMobile()) {
+                document.body.classList.remove('mob-view-input', 'mob-view-charts', 'mob-view-reports', 'mob-view-score');
+                document.body.classList.add('mob-view-charts');
+                document.querySelectorAll('.mob-tab').forEach(b => {
+                    b.classList.toggle('active', b.dataset.view === 'mob-view-charts');
+                });
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                // 確保圖表尺寸正確
+                setTimeout(() => renderMainCharts(simResults), 50);
+            }
+
         } catch (e) {
             console.error(e);
             showToast(`❌ 錯誤：${e.message}`, 'error');
@@ -230,7 +286,7 @@ function updateSummaryBar(results, score, p) {
 
     if (bankruptRes) {
         summaryEl.className = 'summary-bar danger';
-        summaryEl.innerHTML = `⚠️ 警告：根據推算，您將在 <b>${bankruptRes.age} 歲</b>時破產！建議調整收支或延遲退休。&nbsp;&nbsp;<b>評分: ${score.score}/100</b>`;
+        summaryEl.innerHTML = `⚠️ 警告：根據推算，您將在 <b>${bankruptRes.age} 歲</b>時破產！建議調整收支。&nbsp;&nbsp;<b>評分: ${score.score}/100</b>`;
     } else {
         summaryEl.className = 'summary-bar success';
         summaryEl.innerHTML = `✅ 恭喜！您能安穩度過一生。預計 <b>${p.lifeExpectancy} 歲</b>時剩餘總資產約 <b>${fmtWan(finalAssets)} 萬</b>。&nbsp;&nbsp;<b>評分: ${score.score}/100</b>`;
@@ -346,6 +402,17 @@ function showToast(msg, type = 'info') {
 document.addEventListener('DOMContentLoaded', () => {
     bindSliders();
     initTabs();
+    initMobileNavigation();
+    initAccordion();
+
+    // Resize handler for Chart.js
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+            if (simResults.length) renderMainCharts(simResults);
+        }, 200);
+    });
 
     // Run button
     $('btn-run').addEventListener('click', runSimulation);

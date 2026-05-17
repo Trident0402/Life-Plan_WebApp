@@ -11,11 +11,14 @@ function destroyChart(inst) { if (inst) inst.destroy(); }
 //  Tab 1 ─ 資產趨勢 & 現金流圖表
 // ────────────────────────────────────────────────
 function renderMainCharts(results) {
+    const isMob = typeof isMobile === 'function' && isMobile();
     const ages        = results.map(r => r.age);
     const totalAssets = results.map(r => r.totalAssets / 10000);
     const invested    = results.map(r => r.investedAssets / 10000);
     const cashArr     = results.map(r => r.cashAssets / 10000);
     const netCf       = results.map(r => r.netCashFlow / 10000);
+
+    const tickStep = isMob ? 5 : 1; // 手機版 x 軸密度減少
 
     // ── Asset chart ──
     destroyChart(assetChartInst);
@@ -35,7 +38,7 @@ function renderMainCharts(results) {
                 responsive: true, maintainAspectRatio: false,
                 interaction: { mode: 'index', intersect: false },
                 plugins: {
-                    legend: { labels: { color: '#e0e0e0', font: { size: 13 } } },
+                    legend: { position: 'top', labels: { color: '#e0e0e0', font: { size: 13 }, boxWidth: 12 } },
                     tooltip: {
                         backgroundColor: 'rgba(13,27,42,0.95)', titleColor: '#4fc3f7', bodyColor: '#e0e0e0',
                         borderColor: '#4fc3f7', borderWidth: 1,
@@ -47,8 +50,23 @@ function renderMainCharts(results) {
                     annotation: buildAnnotations(results)
                 },
                 scales: {
-                    x: { ticks: { color: '#90a4ae', font: { size: 11 } }, grid: { color: 'rgba(255,255,255,0.05)' }, title: { display: true, text: '年齡', color: '#90a4ae' } },
-                    y: { ticks: { color: '#90a4ae', font: { size: 11 } }, grid: { color: 'rgba(255,255,255,0.07)' }, title: { display: true, text: '金額 (萬)', color: '#90a4ae' } }
+                    x: { 
+                        ticks: { 
+                            color: '#90a4ae', font: { size: 11 },
+                            callback: function(val, index) {
+                                const age = ages[index];
+                                return (age % tickStep === 0) ? age : null;
+                            },
+                            maxRotation: 0 
+                        }, 
+                        grid: { color: 'rgba(255,255,255,0.05)' }, 
+                        title: { display: !isMob, text: '年齡', color: '#90a4ae' } 
+                    },
+                    y: { 
+                        ticks: { color: '#90a4ae', font: { size: 11 } }, 
+                        grid: { color: 'rgba(255,255,255,0.07)' }, 
+                        title: { display: !isMob, text: '金額 (萬)', color: '#90a4ae' } 
+                    }
                 }
             }
         }
@@ -79,8 +97,23 @@ function renderMainCharts(results) {
                     }
                 },
                 scales: {
-                    x: { ticks: { color: '#90a4ae', font: { size: 11 } }, grid: { color: 'rgba(255,255,255,0.05)' }, title: { display: true, text: '年齡', color: '#90a4ae' } },
-                    y: { ticks: { color: '#90a4ae', font: { size: 11 } }, grid: { color: 'rgba(255,255,255,0.07)' }, title: { display: true, text: '萬', color: '#90a4ae' } }
+                    x: { 
+                        ticks: { 
+                            color: '#90a4ae', font: { size: 11 },
+                            callback: function(val, index) {
+                                const age = ages[index];
+                                return (age % tickStep === 0) ? age : null;
+                            },
+                            maxRotation: 0 
+                        }, 
+                        grid: { color: 'rgba(255,255,255,0.05)' }, 
+                        title: { display: !isMob, text: '年齡', color: '#90a4ae' } 
+                    },
+                    y: { 
+                        ticks: { color: '#90a4ae', font: { size: 11 } }, 
+                        grid: { color: 'rgba(255,255,255,0.07)' }, 
+                        title: { display: !isMob, text: '萬', color: '#90a4ae' } 
+                    }
                 }
             }
         }
@@ -88,6 +121,7 @@ function renderMainCharts(results) {
 }
 
 function buildAnnotations(results) {
+    const isMob = typeof isMobile === 'function' && isMobile();
     const annotations = {};
     const seen = new Set();
     results.forEach(r => {
@@ -95,9 +129,10 @@ function buildAnnotations(results) {
             const label = r.note.replace(/【|】/g, '').split(':')[0].trim().slice(0, 8);
             annotations[`evt_${r.age}`] = {
                 type: 'point', xValue: r.age, yValue: r.totalAssets / 10000,
-                backgroundColor: 'rgba(255,213,79,0.9)', radius: 6,
+                backgroundColor: 'rgba(255,213,79,0.9)', radius: isMob ? 4 : 6,
                 label: {
-                    display: true, content: label, color: '#0d1b2a',
+                    display: !isMob, // 手機版隱藏 annotation label 避免擁擠，只保留點
+                    content: label, color: '#0d1b2a',
                     backgroundColor: 'rgba(255,213,79,0.9)', borderRadius: 4,
                     font: { size: 11, weight: 'bold' }, position: 'top'
                 }
@@ -156,11 +191,18 @@ function renderPieCharts(res, age) {
 }
 
 function pieOpts(title) {
+    const isMob = typeof isMobile === 'function' && isMobile();
     return {
         responsive: true, maintainAspectRatio: false,
         plugins: {
-            legend: { position: 'bottom', labels: { color: '#c0d0e0', font: { size: 11 }, padding: 10, boxWidth: 12 } },
-            title: { display: true, text: title, color: '#e0e0e0', font: { size: 12, weight: 'bold' }, padding: { bottom: 8 } },
+            legend: { 
+                position: isMob ? 'bottom' : 'bottom', 
+                labels: { color: '#c0d0e0', font: { size: isMob ? 10 : 11 }, padding: isMob ? 8 : 10, boxWidth: 12 } 
+            },
+            title: { 
+                display: true, text: title, color: '#e0e0e0', 
+                font: { size: isMob ? 13 : 12, weight: 'bold' }, padding: { bottom: 8 } 
+            },
             tooltip: {
                 backgroundColor: 'rgba(13,27,42,0.95)', titleColor: '#4fc3f7', bodyColor: '#e0e0e0',
                 callbacks: { label: c => ` ${c.label}: ${(c.parsed/10000).toFixed(2)} 萬` }
