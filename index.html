@@ -5,24 +5,22 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>人生財務規劃模擬器</title>
 <meta name="description" content="終身財務規劃模擬工具，計算資產、房貸、稅務、退休規劃。">
-<link rel="stylesheet" href="css/style.css">
-<!-- Chart.js + Annotation plugin -->
+<link rel="stylesheet" href="style.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
 </head>
 <body>
 <div class="app-layout">
 
-<!-- ═══════════════════════════════════════════════
+<!-- ══════════════════════════════════════════
      SIDEBAR — 參數輸入
-══════════════════════════════════════════════════ -->
+══════════════════════════════════════════ -->
 <aside class="sidebar">
   <div class="sidebar-header">
     <h1>💼 人生財務規劃模擬器</h1>
     <p>Life Financial Planning Simulator</p>
   </div>
 
-  <!-- 參數頁籤按鈕 -->
   <div class="ptab-nav">
     <button class="ptab-btn active" data-target="ptab-basic">基本資產</button>
     <button class="ptab-btn" data-target="ptab-cashflow">收支債務</button>
@@ -32,7 +30,7 @@
 
   <div class="ptab-panels">
 
-    <!-- ── 基本資產 ── -->
+    <!-- 基本資產 -->
     <div class="ptab-panel active" id="ptab-basic">
       <div class="form-card">
         <div class="form-card-title">👤 基本資料</div>
@@ -47,7 +45,7 @@
       </div>
     </div>
 
-    <!-- ── 收支債務 ── -->
+    <!-- 收支債務 -->
     <div class="ptab-panel" id="ptab-cashflow">
       <div class="form-card">
         <div class="form-card-title">💰 收支與成長規劃</div>
@@ -98,7 +96,7 @@
       </div>
     </div>
 
-    <!-- ── 房車消費 ── -->
+    <!-- 房車消費 -->
     <div class="ptab-panel" id="ptab-mortgage">
       <div class="form-card">
         <div class="form-card-title">🏡 房貸規劃</div>
@@ -155,7 +153,7 @@
       </div>
     </div>
 
-    <!-- ── 稅務目標 ── -->
+    <!-- 稅務目標 -->
     <div class="ptab-panel" id="ptab-tax">
       <div class="form-card">
         <div class="form-card-title">📜 台灣所得稅扣除額</div>
@@ -174,7 +172,6 @@
 
   </div><!-- /ptab-panels -->
 
-  <!-- 操作按鈕 -->
   <div class="sidebar-actions">
     <div class="action-row">
       <button class="btn btn-outline" id="btn-load">📂 載入</button>
@@ -186,15 +183,13 @@
   </div>
 </aside>
 
-<!-- ═══════════════════════════════════════════════
-     MAIN CONTENT — 結果顯示
-══════════════════════════════════════════════════ -->
+<!-- ══════════════════════════════════════════
+     MAIN — 結果顯示
+══════════════════════════════════════════ -->
 <main class="main-content">
 
-  <!-- 摘要列 -->
   <div class="summary-bar idle" id="summary-bar">歡迎！請在左側輸入參數並點擊推算</div>
 
-  <!-- 結果頁籤 -->
   <nav class="rtab-nav">
     <button class="rtab-btn active" data-target="tab-charts">📊 視覺化圖表</button>
     <button class="rtab-btn" data-target="tab-pies">🍩 現況圓餅圖</button>
@@ -206,7 +201,7 @@
 
   <div class="rtab-panels">
 
-    <!-- ── 圖表 ── -->
+    <!-- 圖表 -->
     <div class="rtab-panel active" id="tab-charts">
       <div class="chart-container">
         <h3>📈 終身資產變化趨勢 (萬元)</h3>
@@ -218,7 +213,7 @@
       </div>
     </div>
 
-    <!-- ── 圓餅圖 ── -->
+    <!-- 圓餅圖 -->
     <div class="rtab-panel" id="tab-pies">
       <div class="pie-controls">
         <label>選擇顯示年齡：</label>
@@ -232,7 +227,7 @@
       </div>
     </div>
 
-    <!-- ── 水位表 ── -->
+    <!-- 水位表 -->
     <div class="rtab-panel" id="tab-table">
       <div class="table-wrap">
         <table class="asset-table">
@@ -254,7 +249,7 @@
       </div>
     </div>
 
-    <!-- ── 財務報表 ── -->
+    <!-- 財務報表 -->
     <div class="rtab-panel" id="tab-stmts">
       <div class="stmt-controls">
         <label>選擇報表年齡：</label>
@@ -335,7 +330,7 @@
       </div>
     </div>
 
-    <!-- ── 財務評分 ── -->
+    <!-- 財務評分 -->
     <div class="rtab-panel" id="tab-score">
       <div class="score-layout">
         <div class="score-gauge-card">
@@ -350,7 +345,9 @@
               <small>/ 100</small>
             </div>
           </div>
-          <p style="font-size:12px;color:var(--text-muted);text-align:center;line-height:1.6;">評分基於：破產風險、晚年資產、退休前現金流、緊急預備金、負債比</p>
+          <p style="font-size:12px;color:var(--text-muted);text-align:center;line-height:1.6;">
+            基於：破產風險、晚年資產、退休前現金流、緊急預備金、負債比
+          </p>
         </div>
         <div class="score-detail-card">
           <div class="score-section-title">📋 評估結果</div>
@@ -361,25 +358,24 @@
       </div>
     </div>
 
-    <!-- ── 計算說明 ── -->
+    <!-- 計算說明 -->
     <div class="rtab-panel" id="tab-info">
       <div class="info-content">
         <h3>📖 系統計算原理說明</h3>
         <h4>1. 投資複利設計</h4>
-        <p>資產的滾動方式：去年投資本金 × (1 + 預期報酬率) + 當年剩餘現金流 × 投入比例。</p>
+        <p>去年投資本金 × (1 + 預期報酬率) + 當年剩餘現金流 × 投入比例。</p>
         <h4>2. 月薪與年薪轉換</h4>
-        <p>全年總收入 = (月薪 × 12) + (月薪 × 年終月數)。月薪每年依年薪成長率做複利調升，直至退休年齡。</p>
-        <h4>3. 房貸與寬限期設計</h4>
-        <p>在買房年紀的那一年，系統會依照「房屋總價 × 頭期款比例」，強制從現金/投資庫存中一次性扣除。<br>
-        寬限期內僅繳利息，期滿後剩餘貸款採「等額本息」攤還至貸款年限結束。</p>
-        <h4>4. 生活費用與通膨</h4>
-        <p>每一年不論是否退休，「每月基本生活費」與「旅遊基金」都會被通膨率放大。</p>
-        <h4>5. 台灣所得稅計算</h4>
-        <p>依照 113 年度累進稅率：5% / 12% / 20% / 30% / 40%，扣除免稅額、標準扣除額與薪資所得特別扣除額後計算。</p>
-        <h4>6. 目標反向推算器</h4>
-        <p>使用年金終值 (FV) 推算法，估算現有投資滾動至目標年齡後的價值，並計算達到目標所需的每月定期定額投入金額。</p>
-        <h4>7. 財務評分 (滿分 100)</h4>
-        <p>扣分項目：破產風險（最多 80 分）、晚年資產不足（-10~20 分）、退休前赤字年數（最多 -20 分）、緊急預備金不足（-10 分）、高負債比（-5~10 分）。</p>
+        <p>全年總收入 = (月薪 × 12) + (月薪 × 年終月數)，月薪每年依年薪成長率複利調升直至退休。</p>
+        <h4>3. 房貸與寬限期</h4>
+        <p>買房年份依「房屋總價 × 頭期款比例」一次性扣除頭期款。寬限期內僅繳利息，期滿後採等額本息攤還。</p>
+        <h4>4. 生活費與通膨</h4>
+        <p>每年不論是否退休，生活費與旅遊費都會依通膨率放大。</p>
+        <h4>5. 台灣所得稅</h4>
+        <p>依累進稅率 5% / 12% / 20% / 30% / 40%，扣除免稅額、標準扣除額、薪資所得特別扣除額後計算。</p>
+        <h4>6. 目標反向推算</h4>
+        <p>採年金終值 (FV) 推算，計算達到目標所需每月定期定額投入金額。</p>
+        <h4>7. 財務評分 (100分)</h4>
+        <p>扣分：破產風險最多 -80、晚年資產不足 -10~20、退休前赤字 -2/年最多 -20、緊急預備金不足 -10、高負債比 -5~10。</p>
       </div>
     </div>
 
@@ -388,11 +384,11 @@
 
 </div><!-- /app-layout -->
 
-<!-- JS 模組 -->
-<script src="js/engine.js"></script>
-<script src="js/storage.js"></script>
-<script src="js/charts.js"></script>
-<script src="js/statements.js"></script>
-<script src="js/app.js"></script>
+<!-- 所有 JS 同目錄 -->
+<script src="engine.js"></script>
+<script src="storage.js"></script>
+<script src="charts.js"></script>
+<script src="statements.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
