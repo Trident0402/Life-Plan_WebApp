@@ -190,6 +190,16 @@
 
   <div class="summary-bar idle" id="summary-bar">歡迎！請在左側輸入參數並點擊推算</div>
 
+  <!-- 手機版專屬：次級切換器 (Sub-segment Navigation) -->
+  <div class="sub-tab-nav" id="sub-nav-charts">
+    <button class="sub-tab-btn active" data-sub-target="tab-charts">📈 趨勢圖表</button>
+    <button class="sub-tab-btn" data-sub-target="tab-pies">🍩 現況圓餅</button>
+  </div>
+  <div class="sub-tab-nav" id="sub-nav-reports">
+    <button class="sub-tab-btn active" data-sub-target="tab-table">📃 水位試算</button>
+    <button class="sub-tab-btn" data-sub-target="tab-stmts">📑 財務報表</button>
+  </div>
+
   <nav class="rtab-nav">
     <button class="rtab-btn active" data-target="tab-charts">📊 視覺化圖表</button>
     <button class="rtab-btn" data-target="tab-pies">🍩 現況圓餅圖</button>
@@ -259,13 +269,18 @@
         <input type="range" id="stmt-age-slider" min="20" max="90" value="30" step="1">
         <span class="age-badge" id="stmt-age-label">30 歲</span>
       </div>
+
+      <!-- 新增：三大報表內部子分頁 Tab (Mobile & Desktop 共通) -->
+      <div class="inner-tab-nav" id="stmt-inner-nav">
+        <button class="inner-tab-btn active" data-stmt-target="stmt-bs">🏦 資產負債表</button>
+        <button class="inner-tab-btn" data-stmt-target="stmt-is">📊 損益表</button>
+        <button class="inner-tab-btn" data-stmt-target="stmt-cf">💧 現金流量表</button>
+      </div>
+
       <div class="stmt-grid">
         <!-- 資產負債表 -->
-        <div class="stmt-card">
-          <div class="stmt-accordion-header">
-            <span>🏦 資產負債表</span>
-            <span class="accordion-arrow">▼</span>
-          </div>
+        <div class="stmt-card inner-tab-panel active" id="stmt-bs">
+          <div class="stmt-card-header-label">🏦 資產負債表 Balance Sheet</div>
           <div class="stmt-accordion-body open">
             <div class="stmt-section">
               <div class="stmt-section-title">資產 Assets</div>
@@ -289,11 +304,8 @@
           </div>
         </div>
         <!-- 損益表 -->
-        <div class="stmt-card">
-          <div class="stmt-accordion-header">
-            <span>📊 損益表</span>
-            <span class="accordion-arrow">▼</span>
-          </div>
+        <div class="stmt-card inner-tab-panel" id="stmt-is">
+          <div class="stmt-card-header-label">📊 損益表 Income Statement</div>
           <div class="stmt-accordion-body open">
             <div class="stmt-section">
               <div class="stmt-section-title">收入 Revenue</div>
@@ -319,11 +331,8 @@
           </div>
         </div>
         <!-- 現金流量表 -->
-        <div class="stmt-card">
-          <div class="stmt-accordion-header">
-            <span>💧 現金流量表</span>
-            <span class="accordion-arrow">▼</span>
-          </div>
+        <div class="stmt-card inner-tab-panel" id="stmt-cf">
+          <div class="stmt-card-header-label">💧 現金流量表 Cash Flow</div>
           <div class="stmt-accordion-body open">
             <div class="stmt-section">
               <div class="stmt-section-title">營業活動現金流</div>

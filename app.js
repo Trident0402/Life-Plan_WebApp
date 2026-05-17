@@ -49,14 +49,81 @@ function initTabs() {
             btn.classList.add('active');
             $(btn.dataset.target).classList.add('active');
 
-            // 觸發圖表 resize
-            if (btn.dataset.target === 'tab-charts' && simResults.length) renderMainCharts(simResults);
+            // 觸發圖表/圓餅圖 resize
+            if (btn.dataset.target === 'tab-charts' && simResults.length) {
+                renderMainCharts(simResults);
+            } else if (btn.dataset.target === 'tab-pies' && simResults.length) {
+                const pieAge = parseInt($('pie-age-slider').value);
+                updatePieAge(pieAge);
+            }
+        });
+    });
+}
+
+/**
+ * 手機版次級分頁切換器 (Segmented Controls)
+ */
+function initSubTabs() {
+    document.querySelectorAll('.sub-tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const parentId = btn.parentElement.id; // 'sub-nav-charts' 或 'sub-nav-reports'
+            const targetId = btn.dataset.subTarget; // 'tab-charts', 'tab-pies', 'tab-table', 'tab-stmts'
+
+            // 切換按鈕 active 樣式
+            btn.parentElement.querySelectorAll('.sub-tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            // 依據切換標的調整 Body Class
+            if (parentId === 'sub-nav-charts') {
+                document.body.classList.remove('show-sub-charts', 'show-sub-pies');
+                if (targetId === 'tab-charts') {
+                    document.body.classList.add('show-sub-charts');
+                    if (simResults.length) {
+                        setTimeout(() => { renderMainCharts(simResults); }, 50);
+                    }
+                } else {
+                    document.body.classList.add('show-sub-pies');
+                    if (simResults.length) {
+                        const age = parseInt($('pie-age-slider').value);
+                        setTimeout(() => { updatePieAge(age); }, 50);
+                    }
+                }
+            } else if (parentId === 'sub-nav-reports') {
+                document.body.classList.remove('show-sub-table', 'show-sub-stmts');
+                if (targetId === 'tab-table') {
+                    document.body.classList.add('show-sub-table');
+                } else {
+                    document.body.classList.add('show-sub-stmts');
+                }
+            }
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    });
+}
+
+/**
+ * 三大報表內部子分頁 Tab 邏輯 (Mobile & Desktop 共通)
+ */
+function initStmtTabs() {
+    document.querySelectorAll('.inner-tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            // 切換按鈕 active
+            document.querySelectorAll('.inner-tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            // 切換報表面板顯示
+            const targetPanelId = btn.dataset.stmtTarget;
+            document.querySelectorAll('.inner-tab-panel').forEach(panel => {
+                panel.classList.remove('active');
+            });
+            $(targetPanelId).classList.add('active');
         });
     });
 }
 
 function initMobileNavigation() {
-    // 預設為輸入視圖 (如果沒有的話)
+    // 預設為輸入視圖
     if (!document.body.className.includes('mob-view-')) {
         document.body.classList.add('mob-view-input');
     }
@@ -68,31 +135,32 @@ function initMobileNavigation() {
             btn.classList.add('active');
             
             // 清除所有的 mobile view class
-            document.body.classList.remove('mob-view-input', 'mob-view-charts', 'mob-view-reports', 'mob-view-score');
+            document.body.classList.remove(
+                'mob-view-input', 'mob-view-charts', 'mob-view-reports', 'mob-view-score',
+                'show-sub-charts', 'show-sub-pies', 'show-sub-table', 'show-sub-stmts'
+            );
+            
             const viewId = btn.dataset.view;
             document.body.classList.add(viewId);
             
-            // 如果切換到圖表，觸發重繪確保自適應
-            if (viewId === 'mob-view-charts' && simResults.length) {
-                setTimeout(() => { renderMainCharts(simResults); }, 50);
+            // 當切換到主要 View 時，自動初始化對應的子頁面狀態
+            if (viewId === 'mob-view-charts') {
+                document.body.classList.add('show-sub-charts');
+                const subNav = $('sub-nav-charts');
+                subNav.querySelectorAll('.sub-tab-btn').forEach(b => b.classList.remove('active'));
+                subNav.querySelector('[data-sub-target="tab-charts"]').classList.add('active');
+                
+                if (simResults.length) {
+                    setTimeout(() => { renderMainCharts(simResults); }, 50);
+                }
+            } else if (viewId === 'mob-view-reports') {
+                document.body.classList.add('show-sub-table');
+                const subNav = $('sub-nav-reports');
+                subNav.querySelectorAll('.sub-tab-btn').forEach(b => b.classList.remove('active'));
+                subNav.querySelector('[data-sub-target="tab-table"]').classList.add('active');
             }
             
-            // 捲動到頂部
             window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
-    });
-}
-
-function initAccordion() {
-    document.querySelectorAll('.stmt-accordion-header').forEach(header => {
-        header.addEventListener('click', () => {
-            // 在桌面版不啟用折疊功能（CSS 已隱藏箭頭並鎖死高度）
-            if (!isMobile()) return;
-            
-            const body = header.nextElementSibling;
-            const isOpen = body.classList.toggle('open');
-            const arrow = header.querySelector('.accordion-arrow');
-            if (arrow) arrow.textContent = isOpen ? '▲' : '▼';
         });
     });
 }
@@ -256,8 +324,17 @@ function runSimulation() {
 
             // 📱 手機版：推算完成後自動跳轉到圖表分析視圖
             if (isMobile()) {
-                document.body.classList.remove('mob-view-input', 'mob-view-charts', 'mob-view-reports', 'mob-view-score');
-                document.body.classList.add('mob-view-charts');
+                document.body.classList.remove(
+                    'mob-view-input', 'mob-view-charts', 'mob-view-reports', 'mob-view-score',
+                    'show-sub-charts', 'show-sub-pies', 'show-sub-table', 'show-sub-stmts'
+                );
+                document.body.classList.add('mob-view-charts', 'show-sub-charts');
+                
+                // 重置次級導覽列
+                const subNav = $('sub-nav-charts');
+                subNav.querySelectorAll('.sub-tab-btn').forEach(b => b.classList.remove('active'));
+                subNav.querySelector('[data-sub-target="tab-charts"]').classList.add('active');
+
                 document.querySelectorAll('.mob-tab').forEach(b => {
                     b.classList.toggle('active', b.dataset.view === 'mob-view-charts');
                 });
@@ -402,8 +479,9 @@ function showToast(msg, type = 'info') {
 document.addEventListener('DOMContentLoaded', () => {
     bindSliders();
     initTabs();
+    initSubTabs();
+    initStmtTabs();
     initMobileNavigation();
-    initAccordion();
 
     // Resize handler for Chart.js
     let resizeTimer;
