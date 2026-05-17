@@ -20,6 +20,27 @@ function renderMainCharts(results) {
 
     const tickStep = isMob ? 5 : 1; // 手機版 x 軸密度減少
 
+    // Light Theme Colors
+    const colorTotal = '#8c9e82'; // Sage Green
+    const colorInv   = 'rgba(217, 193, 156, 0.4)'; // Warm Beige/Wheat Fill
+    const colorInvLine = '#d9c19c';
+    const colorCash  = 'rgba(129, 156, 141, 0.3)'; // Muted Teal/Green Fill
+    const colorCashLine = '#819c8d';
+    
+    const fontColor = '#7a7a7a';
+    const gridColor = 'rgba(0,0,0,0.04)';
+
+    const tooltipOpts = {
+        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+        titleColor: '#4a4a4a',
+        bodyColor: '#4a4a4a',
+        borderColor: 'rgba(0,0,0,0.08)',
+        borderWidth: 1,
+        padding: 12,
+        titleFont: { size: 14, weight: 'bold' },
+        bodyFont: { size: 13 }
+    };
+
     // ── Asset chart ──
     destroyChart(assetChartInst);
     assetChartInst = new Chart(
@@ -29,19 +50,18 @@ function renderMainCharts(results) {
             data: {
                 labels: ages,
                 datasets: [
-                    { label: '總資產 (萬)', data: totalAssets, borderColor: '#4fc3f7', backgroundColor: 'rgba(79,195,247,0.08)', borderWidth: 3, pointRadius: 2, pointHoverRadius: 6, tension: 0.4, fill: false, order: 1 },
-                    { label: '投資部位 (萬)', data: invested, borderColor: '#ffd54f', backgroundColor: 'rgba(255,213,79,0.25)', borderWidth: 1.5, pointRadius: 0, tension: 0.4, fill: true, order: 2 },
-                    { label: '現金部位 (萬)', data: cashArr, borderColor: '#81c784', backgroundColor: 'rgba(129,199,132,0.2)', borderWidth: 1.5, pointRadius: 0, tension: 0.4, fill: true, order: 3 }
+                    { label: '總資產 (萬)', data: totalAssets, borderColor: colorTotal, backgroundColor: colorTotal, borderWidth: 3, pointRadius: isMob?0:2, pointHoverRadius: 6, tension: 0.4, fill: false, order: 1 },
+                    { label: '投資部位 (萬)', data: invested, borderColor: colorInvLine, backgroundColor: colorInv, borderWidth: 1.5, pointRadius: 0, tension: 0.4, fill: true, order: 2 },
+                    { label: '現金部位 (萬)', data: cashArr, borderColor: colorCashLine, backgroundColor: colorCash, borderWidth: 1.5, pointRadius: 0, tension: 0.4, fill: true, order: 3 }
                 ]
             },
             options: {
                 responsive: true, maintainAspectRatio: false,
                 interaction: { mode: 'index', intersect: false },
                 plugins: {
-                    legend: { position: 'top', labels: { color: '#e0e0e0', font: { size: 13 }, boxWidth: 12 } },
+                    legend: { position: 'top', labels: { color: fontColor, font: { size: 13, family: 'Inter' }, usePointStyle: true, boxWidth: 8 } },
                     tooltip: {
-                        backgroundColor: 'rgba(13,27,42,0.95)', titleColor: '#4fc3f7', bodyColor: '#e0e0e0',
-                        borderColor: '#4fc3f7', borderWidth: 1,
+                        ...tooltipOpts,
                         callbacks: {
                             title: c => `${c[0].label} 歲`,
                             label: c => ` ${c.dataset.label}: ${c.parsed.y.toFixed(1)} 萬`
@@ -52,20 +72,20 @@ function renderMainCharts(results) {
                 scales: {
                     x: { 
                         ticks: { 
-                            color: '#90a4ae', font: { size: 11 },
+                            color: fontColor, font: { size: 11 },
                             callback: function(val, index) {
                                 const age = ages[index];
                                 return (age % tickStep === 0) ? age : null;
                             },
                             maxRotation: 0 
                         }, 
-                        grid: { color: 'rgba(255,255,255,0.05)' }, 
-                        title: { display: !isMob, text: '年齡', color: '#90a4ae' } 
+                        grid: { color: gridColor }, 
+                        title: { display: !isMob, text: '年齡', color: fontColor } 
                     },
                     y: { 
-                        ticks: { color: '#90a4ae', font: { size: 11 } }, 
-                        grid: { color: 'rgba(255,255,255,0.07)' }, 
-                        title: { display: !isMob, text: '金額 (萬)', color: '#90a4ae' } 
+                        ticks: { color: fontColor, font: { size: 11 } }, 
+                        grid: { color: gridColor }, 
+                        title: { display: !isMob, text: '金額 (萬)', color: fontColor } 
                     }
                 }
             }
@@ -74,22 +94,21 @@ function renderMainCharts(results) {
 
     // ── Cash flow chart ──
     destroyChart(cfChartInst);
-    const cfColors = netCf.map(v => v >= 0 ? 'rgba(129,199,132,0.85)' : 'rgba(239,83,80,0.85)');
+    const cfColors = netCf.map(v => v >= 0 ? '#a8b89f' : '#d89b88'); // Light Sage vs Muted Red
     cfChartInst = new Chart(
         document.getElementById('cashFlowChart').getContext('2d'),
         {
             type: 'bar',
             data: {
                 labels: ages,
-                datasets: [{ label: '年度淨現金流 (萬)', data: netCf, backgroundColor: cfColors, borderColor: cfColors, borderWidth: 0, borderRadius: 2 }]
+                datasets: [{ label: '年度淨現金流 (萬)', data: netCf, backgroundColor: cfColors, borderColor: cfColors, borderWidth: 0, borderRadius: 4 }]
             },
             options: {
                 responsive: true, maintainAspectRatio: false,
                 plugins: {
-                    legend: { labels: { color: '#e0e0e0' } },
+                    legend: { labels: { color: fontColor, usePointStyle: true, boxWidth: 8 } },
                     tooltip: {
-                        backgroundColor: 'rgba(13,27,42,0.95)', titleColor: '#ffd54f', bodyColor: '#e0e0e0',
-                        borderColor: '#ffd54f', borderWidth: 1,
+                        ...tooltipOpts,
                         callbacks: {
                             title: c => `${c[0].label} 歲`,
                             label: c => ` 淨現金流: ${c.parsed.y.toFixed(1)} 萬`
@@ -99,20 +118,20 @@ function renderMainCharts(results) {
                 scales: {
                     x: { 
                         ticks: { 
-                            color: '#90a4ae', font: { size: 11 },
+                            color: fontColor, font: { size: 11 },
                             callback: function(val, index) {
                                 const age = ages[index];
                                 return (age % tickStep === 0) ? age : null;
                             },
                             maxRotation: 0 
                         }, 
-                        grid: { color: 'rgba(255,255,255,0.05)' }, 
-                        title: { display: !isMob, text: '年齡', color: '#90a4ae' } 
+                        grid: { color: gridColor }, 
+                        title: { display: !isMob, text: '年齡', color: fontColor } 
                     },
                     y: { 
-                        ticks: { color: '#90a4ae', font: { size: 11 } }, 
-                        grid: { color: 'rgba(255,255,255,0.07)' }, 
-                        title: { display: !isMob, text: '萬', color: '#90a4ae' } 
+                        ticks: { color: fontColor, font: { size: 11 } }, 
+                        grid: { color: gridColor }, 
+                        title: { display: !isMob, text: '萬', color: fontColor } 
                     }
                 }
             }
@@ -129,12 +148,14 @@ function buildAnnotations(results) {
             const label = r.note.replace(/【|】/g, '').split(':')[0].trim().slice(0, 8);
             annotations[`evt_${r.age}`] = {
                 type: 'point', xValue: r.age, yValue: r.totalAssets / 10000,
-                backgroundColor: 'rgba(255,213,79,0.9)', radius: isMob ? 4 : 6,
+                backgroundColor: '#d9c19c', radius: isMob ? 4 : 6,
+                borderColor: '#ffffff', borderWidth: 2,
                 label: {
-                    display: !isMob, // 手機版隱藏 annotation label 避免擁擠，只保留點
-                    content: label, color: '#0d1b2a',
-                    backgroundColor: 'rgba(255,213,79,0.9)', borderRadius: 4,
-                    font: { size: 11, weight: 'bold' }, position: 'top'
+                    display: !isMob,
+                    content: label, color: '#4a4a4a',
+                    backgroundColor: 'rgba(255, 255, 255, 0.9)', borderRadius: 6,
+                    font: { size: 11, weight: 'bold' }, position: 'top',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
                 }
             };
             seen.add(r.age);
@@ -146,7 +167,8 @@ function buildAnnotations(results) {
 // ────────────────────────────────────────────────
 //  Tab 2 ─ 圓餅圖
 // ────────────────────────────────────────────────
-const PIE_COLORS = ['#ef5350','#42a5f5','#66bb6a','#ff7043','#ffca28','#ab47bc','#26c6da','#4caf50'];
+// Earthy Light Theme Pie Colors (Sage, Beige, Pink, Gray, etc.)
+const PIE_COLORS = ['#8c9e82', '#e4dbc5', '#d89b88', '#c4cbcf', '#a8b89f', '#d9c19c', '#9eb0a8', '#f2d6c9'];
 
 function renderPieCharts(res, age) {
     const mInc  = res.income / 12;
@@ -167,7 +189,7 @@ function renderPieCharts(res, age) {
     const md = mkData(mItems);
     pieMonthlyInst = new Chart(document.getElementById('pieMonthly').getContext('2d'), {
         type: 'doughnut',
-        data: { labels: md.labels, datasets: [{ data: md.data, backgroundColor: PIE_COLORS, borderColor: '#1a2a3a', borderWidth: 2 }] },
+        data: { labels: md.labels, datasets: [{ data: md.data, backgroundColor: PIE_COLORS, borderColor: '#ffffff', borderWidth: 2, hoverOffset: 4 }] },
         options: pieOpts(`${age} 歲 月收支 (月收: ${Math.round(mInc).toLocaleString('zh-TW')})`)
     });
 
@@ -175,7 +197,7 @@ function renderPieCharts(res, age) {
     const yd = mkData(yItems);
     pieYearlyInst = new Chart(document.getElementById('pieYearly').getContext('2d'), {
         type: 'doughnut',
-        data: { labels: yd.labels, datasets: [{ data: yd.data, backgroundColor: PIE_COLORS, borderColor: '#1a2a3a', borderWidth: 2 }] },
+        data: { labels: yd.labels, datasets: [{ data: yd.data, backgroundColor: PIE_COLORS, borderColor: '#ffffff', borderWidth: 2, hoverOffset: 4 }] },
         options: pieOpts(`${age} 歲 年度收支 (年收: ${(res.income/10000).toFixed(1)}萬)`)
     });
 
@@ -185,7 +207,7 @@ function renderPieCharts(res, age) {
     if (res.investedAssets > 0) { ad.labels.push('投資組合'); ad.data.push(res.investedAssets); }
     pieAssetInst = new Chart(document.getElementById('pieAsset').getContext('2d'), {
         type: 'doughnut',
-        data: { labels: ad.labels, datasets: [{ data: ad.data, backgroundColor: ['#ab47bc','#ffd54f'], borderColor: '#1a2a3a', borderWidth: 2 }] },
+        data: { labels: ad.labels, datasets: [{ data: ad.data, backgroundColor: ['#a8b89f','#d9c19c'], borderColor: '#ffffff', borderWidth: 2, hoverOffset: 4 }] },
         options: pieOpts(`${age} 歲 資產配置 (總額: ${((res.cashAssets+res.investedAssets)/10000).toFixed(1)}萬)`)
     });
 }
@@ -194,17 +216,19 @@ function pieOpts(title) {
     const isMob = typeof isMobile === 'function' && isMobile();
     return {
         responsive: true, maintainAspectRatio: false,
+        cutout: '55%', // Makes it look more modern and thin
         plugins: {
             legend: { 
-                position: isMob ? 'bottom' : 'bottom', 
-                labels: { color: '#c0d0e0', font: { size: isMob ? 10 : 11 }, padding: isMob ? 8 : 10, boxWidth: 12 } 
+                position: isMob ? 'bottom' : 'right', 
+                labels: { color: '#7a7a7a', font: { size: isMob ? 11 : 12 }, padding: 12, usePointStyle: true, boxWidth: 8 } 
             },
             title: { 
-                display: true, text: title, color: '#e0e0e0', 
-                font: { size: isMob ? 13 : 12, weight: 'bold' }, padding: { bottom: 8 } 
+                display: true, text: title, color: '#4a4a4a', 
+                font: { size: isMob ? 14 : 14, weight: 'bold' }, padding: { bottom: 16 } 
             },
             tooltip: {
-                backgroundColor: 'rgba(13,27,42,0.95)', titleColor: '#4fc3f7', bodyColor: '#e0e0e0',
+                backgroundColor: 'rgba(255, 255, 255, 0.95)', titleColor: '#4a4a4a', bodyColor: '#4a4a4a',
+                borderColor: 'rgba(0,0,0,0.08)', borderWidth: 1, padding: 12,
                 callbacks: { label: c => ` ${c.label}: ${(c.parsed/10000).toFixed(2)} 萬` }
             }
         }
