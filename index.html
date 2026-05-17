@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>人生財務規劃模擬器</title>
+<meta name="description" content="終身財務規劃模擬工具，計算資產、房貸、稅務、退休規劃。">
+<link rel="stylesheet" href="css/style.css">
+<!-- Chart.js + Annotation plugin -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+</head>
+<body>
+<div class="app-layout">
+
+<!-- ═══════════════════════════════════════════════
+     SIDEBAR — 參數輸入
+══════════════════════════════════════════════════ -->
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <h1>💼 人生財務規劃模擬器</h1>
+    <p>Life Financial Planning Simulator</p>
+  </div>
+
+  <!-- 參數頁籤按鈕 -->
+  <div class="ptab-nav">
+    <button class="ptab-btn active" data-target="ptab-basic">基本資產</button>
+    <button class="ptab-btn" data-target="ptab-cashflow">收支債務</button>
+    <button class="ptab-btn" data-target="ptab-mortgage">房車消費</button>
+    <button class="ptab-btn" data-target="ptab-tax">稅務目標</button>
+  </div>
+
+  <div class="ptab-panels">
+
+    <!-- ── 基本資產 ── -->
+    <div class="ptab-panel active" id="ptab-basic">
+      <div class="form-card">
+        <div class="form-card-title">👤 基本資料</div>
+        <div class="form-row"><label>目前年齡</label><input type="number" id="current-age" value="30" min="1" max="100"></div>
+        <div class="form-row"><label>預計退休年齡</label><input type="number" id="retire-age" value="65" min="1" max="100"></div>
+        <div class="form-row"><label>預期壽命</label><input type="number" id="life-exp" value="85" min="1" max="120"></div>
+      </div>
+      <div class="form-card">
+        <div class="form-card-title">💼 財務部位現況</div>
+        <div class="form-row"><label>目前現金存款 (元)</label><input type="number" id="current-cash" value="500000"></div>
+        <div class="form-row"><label>目前投資部位 (元)</label><input type="number" id="current-inv" value="100000"></div>
+      </div>
+    </div>
+
+    <!-- ── 收支債務 ── -->
+    <div class="ptab-panel" id="ptab-cashflow">
+      <div class="form-card">
+        <div class="form-card-title">💰 收支與成長規劃</div>
+        <div class="form-row"><label>目前月薪 (元)</label><input type="number" id="monthly-income" value="50000"></div>
+        <div class="form-row"><label>預估年終 (月數)</label><input type="number" id="bonus-months" value="2" step="0.5"></div>
+        <div class="form-row"><label>每月基本生活費</label><input type="number" id="monthly-living" value="25000"></div>
+        <div class="form-row"><label>年度旅遊基金 (元)</label><input type="number" id="travel-exp" value="50000"></div>
+        <div class="form-row">
+          <label>結餘投入投資比例</label>
+          <div class="slider-wrap">
+            <input type="range" id="inv-ratio" min="0" max="100" value="60" step="1">
+            <span class="slider-val">60</span><small>%</small>
+          </div>
+        </div>
+        <div class="form-row">
+          <label>預期通膨率</label>
+          <div class="slider-wrap">
+            <input type="range" id="inflation" min="0" max="10" value="2" step="0.1">
+            <span class="slider-val">2</span><small>%</small>
+          </div>
+        </div>
+        <div class="form-row">
+          <label>預期投資年化報酬率</label>
+          <div class="slider-wrap">
+            <input type="range" id="inv-return" min="0" max="20" value="5" step="0.1">
+            <span class="slider-val">5</span><small>%</small>
+          </div>
+        </div>
+        <div class="form-row">
+          <label>固定年薪成長率</label>
+          <div class="slider-wrap">
+            <input type="range" id="income-growth" min="0" max="10" value="3" step="0.1">
+            <span class="slider-val">3</span><small>%</small>
+          </div>
+        </div>
+      </div>
+      <div class="form-card">
+        <div class="form-card-title">📉 債務規劃 (學貸/信貸)</div>
+        <div class="form-row"><label>負債總額 (元)</label><input type="number" id="debt-amount" value="0"></div>
+        <div class="form-row">
+          <label>負債年利率</label>
+          <div class="slider-wrap">
+            <input type="range" id="debt-rate" min="0" max="20" value="2.5" step="0.1">
+            <span class="slider-val">2.5</span><small>%</small>
+          </div>
+        </div>
+        <div class="form-row"><label>還款期限 (月數)</label><input type="number" id="debt-months" value="0"></div>
+      </div>
+    </div>
+
+    <!-- ── 房車消費 ── -->
+    <div class="ptab-panel" id="ptab-mortgage">
+      <div class="form-card">
+        <div class="form-card-title">🏡 房貸規劃</div>
+        <div class="form-row"><label>計畫買房年齡 (0=不買)</label><input type="number" id="mortgage-age" value="0"></div>
+        <div class="form-row"><label>房屋總價 (元)</label><input type="number" id="mortgage-price" value="15000000"></div>
+        <div class="form-row">
+          <label>頭期款成數</label>
+          <div class="slider-wrap">
+            <input type="range" id="mortgage-down" min="0" max="100" value="20" step="1">
+            <span class="slider-val">20</span><small>%</small>
+          </div>
+        </div>
+        <div class="form-row"><label>貸款總年限 (年)</label><input type="number" id="mortgage-years" value="30"></div>
+        <div class="form-row">
+          <label>固定房貸利率</label>
+          <div class="slider-wrap">
+            <input type="range" id="mortgage-rate" min="0.5" max="10" value="2.1" step="0.05">
+            <span class="slider-val">2.1</span><small>%</small>
+          </div>
+        </div>
+        <div class="form-row"><label>寬限期 (年)</label><input type="number" id="mortgage-grace" value="0"></div>
+        <div class="form-row"><label>裝潢與其他費用 (元)</label><input type="number" id="mortgage-fees" value="0"></div>
+      </div>
+      <div class="form-card">
+        <div class="form-card-title">🚗 車貸規劃</div>
+        <div class="form-row"><label>計畫買車年齡 (0=不買)</label><input type="number" id="car-age" value="0"></div>
+        <div class="form-row"><label>車輛總價 (元)</label><input type="number" id="car-price" value="800000"></div>
+        <div class="form-row">
+          <label>頭期款成數</label>
+          <div class="slider-wrap">
+            <input type="range" id="car-down" min="0" max="100" value="20" step="1">
+            <span class="slider-val">20</span><small>%</small>
+          </div>
+        </div>
+        <div class="form-row"><label>車貸年限 (年)</label><input type="number" id="car-years" value="5"></div>
+        <div class="form-row">
+          <label>固定車貸利率</label>
+          <div class="slider-wrap">
+            <input type="range" id="car-rate" min="0" max="10" value="3.5" step="0.1">
+            <span class="slider-val">3.5</span><small>%</small>
+          </div>
+        </div>
+      </div>
+      <div class="form-card">
+        <div class="form-card-title">🎯 自訂重大消費</div>
+        <div class="form-row"><label>消費1 名稱</label><input type="text" id="ce1-name" value="結婚基金"></div>
+        <div class="form-row"><label>消費1 年齡 (0=無)</label><input type="number" id="ce1-age" value="0"></div>
+        <div class="form-row"><label>消費1 總金額 (元)</label><input type="number" id="ce1-amount" value="500000"></div>
+        <div class="form-row"><label>攤提月數 (0=一次)</label><input type="number" id="ce1-months" value="0"></div>
+        <div class="form-row"><label>消費2 名稱</label><input type="text" id="ce2-name" value="留學/進修"></div>
+        <div class="form-row"><label>消費2 年齡 (0=無)</label><input type="number" id="ce2-age" value="0"></div>
+        <div class="form-row"><label>消費2 總金額 (元)</label><input type="number" id="ce2-amount" value="1000000"></div>
+        <div class="form-row"><label>攤提月數 (0=一次)</label><input type="number" id="ce2-months" value="0"></div>
+      </div>
+    </div>
+
+    <!-- ── 稅務目標 ── -->
+    <div class="ptab-panel" id="ptab-tax">
+      <div class="form-card">
+        <div class="form-card-title">📜 台灣所得稅扣除額</div>
+        <div class="form-row"><label>免稅額 (元)</label><input type="number" id="tax-exemption" value="101000"></div>
+        <div class="form-row"><label>標準扣除額 (元)</label><input type="number" id="tax-std" value="136000"></div>
+        <div class="form-row"><label>薪資所得特別扣除額</label><input type="number" id="tax-sal" value="227000"></div>
+      </div>
+      <div class="form-card">
+        <div class="form-card-title">🚩 目標資金反向推算</div>
+        <div class="form-row"><label>期望達標年齡</label><input type="number" id="goal-age" value="50"></div>
+        <div class="form-row"><label>期望總資產 (萬)</label><input type="number" id="goal-amount" value="3000"></div>
+        <button class="btn btn-success" id="btn-goal" style="width:100%;margin-bottom:8px;">💡 試算每月應存金額</button>
+        <div class="goal-result" id="goal-result">請點擊試算</div>
+      </div>
+    </div>
+
+  </div><!-- /ptab-panels -->
+
+  <!-- 操作按鈕 -->
+  <div class="sidebar-actions">
+    <div class="action-row">
+      <button class="btn btn-outline" id="btn-load">📂 載入</button>
+      <button class="btn btn-outline" id="btn-save">💾 儲存</button>
+      <button class="btn btn-outline" id="btn-export">⬆️ 匯出</button>
+      <button class="btn btn-outline" id="btn-import">⬇️ 匯入</button>
+    </div>
+    <button class="btn btn-primary" id="btn-run">🚀 開始終身財務推算</button>
+  </div>
+</aside>
+
+<!-- ═══════════════════════════════════════════════
+     MAIN CONTENT — 結果顯示
+══════════════════════════════════════════════════ -->
+<main class="main-content">
+
+  <!-- 摘要列 -->
+  <div class="summary-bar idle" id="summary-bar">歡迎！請在左側輸入參數並點擊推算</div>
+
+  <!-- 結果頁籤 -->
+  <nav class="rtab-nav">
+    <button class="rtab-btn active" data-target="tab-charts">📊 視覺化圖表</button>
+    <button class="rtab-btn" data-target="tab-pies">🍩 現況圓餅圖</button>
+    <button class="rtab-btn" data-target="tab-table">📃 資產水位表</button>
+    <button class="rtab-btn" data-target="tab-stmts">📑 個人財務報表</button>
+    <button class="rtab-btn" data-target="tab-score">🏆 財務評分</button>
+    <button class="rtab-btn" data-target="tab-info">ℹ️ 計算說明</button>
+  </nav>
+
+  <div class="rtab-panels">
+
+    <!-- ── 圖表 ── -->
+    <div class="rtab-panel active" id="tab-charts">
+      <div class="chart-container">
+        <h3>📈 終身資產變化趨勢 (萬元)</h3>
+        <div class="chart-canvas-wrap"><canvas id="assetChart"></canvas></div>
+      </div>
+      <div class="chart-container">
+        <h3>💹 年度淨現金流 (萬元)</h3>
+        <div class="chart-canvas-wrap"><canvas id="cashFlowChart"></canvas></div>
+      </div>
+    </div>
+
+    <!-- ── 圓餅圖 ── -->
+    <div class="rtab-panel" id="tab-pies">
+      <div class="pie-controls">
+        <label>選擇顯示年齡：</label>
+        <input type="range" id="pie-age-slider" min="20" max="90" value="30" step="1">
+        <span class="age-badge" id="pie-age-label">30 歲</span>
+      </div>
+      <div class="pie-grid">
+        <div class="pie-card"><canvas id="pieMonthly"></canvas></div>
+        <div class="pie-card"><canvas id="pieYearly"></canvas></div>
+        <div class="pie-card"><canvas id="pieAsset"></canvas></div>
+      </div>
+    </div>
+
+    <!-- ── 水位表 ── -->
+    <div class="rtab-panel" id="tab-table">
+      <div class="table-wrap">
+        <table class="asset-table">
+          <thead>
+            <tr>
+              <th>年齡</th>
+              <th>總資產 (萬)</th>
+              <th>投資部位 (萬)</th>
+              <th>現金存款 (萬)</th>
+              <th>當年稅收 (萬)</th>
+              <th>淨現金流 (萬)</th>
+              <th>人生事件備註</th>
+            </tr>
+          </thead>
+          <tbody id="asset-table-body">
+            <tr><td colspan="7" class="center" style="color:var(--text-muted);padding:32px;">請先執行推算</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── 財務報表 ── -->
+    <div class="rtab-panel" id="tab-stmts">
+      <div class="stmt-controls">
+        <label>選擇報表年齡：</label>
+        <input type="range" id="stmt-age-slider" min="20" max="90" value="30" step="1">
+        <span class="age-badge" id="stmt-age-label">30 歲</span>
+      </div>
+      <div class="stmt-grid">
+        <!-- 資產負債表 -->
+        <div class="stmt-card">
+          <h3>🏦 資產負債表</h3>
+          <div class="stmt-section">
+            <div class="stmt-section-title">資產 Assets</div>
+            <div class="stmt-row"><span class="stmt-label">現金與存款</span><span class="stmt-value" id="bs-cash">—</span></div>
+            <div class="stmt-row"><span class="stmt-label">投資部位</span><span class="stmt-value" id="bs-invest">—</span></div>
+            <hr class="stmt-divider">
+            <div class="stmt-total-row"><span class="stmt-label">總資產</span><span class="stmt-value" id="bs-totalA">—</span></div>
+          </div>
+          <div class="stmt-section">
+            <div class="stmt-section-title">負債 Liabilities</div>
+            <div class="stmt-row"><span class="stmt-label">房屋貸款餘額</span><span class="stmt-value" id="bs-mortgage">—</span></div>
+            <div class="stmt-row"><span class="stmt-label">汽車貸款餘額</span><span class="stmt-value" id="bs-car">—</span></div>
+            <div class="stmt-row"><span class="stmt-label">一般債務餘額</span><span class="stmt-value" id="bs-debt">—</span></div>
+            <hr class="stmt-divider">
+            <div class="stmt-total-row"><span class="stmt-label">總負債</span><span class="stmt-value" id="bs-totalL">—</span></div>
+          </div>
+          <div class="stmt-section">
+            <div class="stmt-section-title">淨值 Net Worth</div>
+            <div class="stmt-total-row"><span class="stmt-label">總淨值</span><span class="stmt-value positive" id="bs-netWorth">—</span></div>
+          </div>
+        </div>
+        <!-- 損益表 -->
+        <div class="stmt-card">
+          <h3>📊 損益表</h3>
+          <div class="stmt-section">
+            <div class="stmt-section-title">收入 Revenue</div>
+            <div class="stmt-row"><span class="stmt-label">年度薪資/年終</span><span class="stmt-value" id="is-income">—</span></div>
+          </div>
+          <div class="stmt-section">
+            <div class="stmt-section-title">支出 Expenses</div>
+            <div class="stmt-row"><span class="stmt-label">基本生活費</span><span class="stmt-value" id="is-living">—</span></div>
+            <div class="stmt-row"><span class="stmt-label">年度旅遊費</span><span class="stmt-value" id="is-travel">—</span></div>
+            <div class="stmt-row"><span class="stmt-label">房貸本息支出</span><span class="stmt-value" id="is-mortgage">—</span></div>
+            <div class="stmt-row"><span class="stmt-label">車貸本息支出</span><span class="stmt-value" id="is-car">—</span></div>
+            <div class="stmt-row"><span class="stmt-label">債務本息支出</span><span class="stmt-value" id="is-debt">—</span></div>
+            <div class="stmt-row"><span class="stmt-label">所得稅支出</span><span class="stmt-value" id="is-tax">—</span></div>
+            <div class="stmt-row"><span class="stmt-label">重大/自訂消費</span><span class="stmt-value" id="is-custom">—</span></div>
+            <div class="stmt-row"><span class="stmt-label">單次重大事件</span><span class="stmt-value" id="is-event">—</span></div>
+            <hr class="stmt-divider">
+            <div class="stmt-total-row"><span class="stmt-label">總支出</span><span class="stmt-value" id="is-totalExp">—</span></div>
+          </div>
+          <div class="stmt-section">
+            <div class="stmt-section-title">淨利 Net Income</div>
+            <div class="stmt-total-row"><span class="stmt-label">本期淨利</span><span class="stmt-value positive" id="is-netIncome">—</span></div>
+          </div>
+        </div>
+        <!-- 現金流量表 -->
+        <div class="stmt-card">
+          <h3>💧 現金流量表</h3>
+          <div class="stmt-section">
+            <div class="stmt-section-title">營業活動現金流</div>
+            <div class="stmt-row"><span class="stmt-label">本期淨利</span><span class="stmt-value" id="cf-netIncome">—</span></div>
+          </div>
+          <div class="stmt-section">
+            <div class="stmt-section-title">投資活動現金流</div>
+            <div class="stmt-row"><span class="stmt-label">投資組合收益</span><span class="stmt-value" id="cf-invGain">—</span></div>
+            <div class="stmt-row"><span class="stmt-label">(由系統比例自動分配)</span><span class="stmt-value">—</span></div>
+          </div>
+          <div class="stmt-section">
+            <div class="stmt-section-title">期末餘額</div>
+            <div class="stmt-row"><span class="stmt-label">現金部位餘額</span><span class="stmt-value" id="cf-cashEnd">—</span></div>
+            <div class="stmt-row"><span class="stmt-label">投資部位餘額</span><span class="stmt-value" id="cf-investEnd">—</span></div>
+          </div>
+          <div class="stmt-section">
+            <div class="stmt-section-title">說明備註</div>
+            <div style="font-size:13px;color:var(--text-secondary);padding:8px;background:var(--bg-card);border-radius:6px;line-height:1.6;" id="cf-note">—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 財務評分 ── -->
+    <div class="rtab-panel" id="tab-score">
+      <div class="score-layout">
+        <div class="score-gauge-card">
+          <h3>財務健康評分</h3>
+          <div class="gauge-wrap">
+            <svg width="140" height="140" viewBox="0 0 140 140">
+              <circle class="gauge-bg" cx="70" cy="70" r="54"/>
+              <circle id="score-circle" cx="70" cy="70" r="54"/>
+            </svg>
+            <div class="gauge-label">
+              <span id="score-value">—</span>
+              <small>/ 100</small>
+            </div>
+          </div>
+          <p style="font-size:12px;color:var(--text-muted);text-align:center;line-height:1.6;">評分基於：破產風險、晚年資產、退休前現金流、緊急預備金、負債比</p>
+        </div>
+        <div class="score-detail-card">
+          <div class="score-section-title">📋 評估結果</div>
+          <ul id="score-comments"></ul>
+          <div class="score-section-title">💡 改善建議</div>
+          <ul id="score-recs"></ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 計算說明 ── -->
+    <div class="rtab-panel" id="tab-info">
+      <div class="info-content">
+        <h3>📖 系統計算原理說明</h3>
+        <h4>1. 投資複利設計</h4>
+        <p>資產的滾動方式：去年投資本金 × (1 + 預期報酬率) + 當年剩餘現金流 × 投入比例。</p>
+        <h4>2. 月薪與年薪轉換</h4>
+        <p>全年總收入 = (月薪 × 12) + (月薪 × 年終月數)。月薪每年依年薪成長率做複利調升，直至退休年齡。</p>
+        <h4>3. 房貸與寬限期設計</h4>
+        <p>在買房年紀的那一年，系統會依照「房屋總價 × 頭期款比例」，強制從現金/投資庫存中一次性扣除。<br>
+        寬限期內僅繳利息，期滿後剩餘貸款採「等額本息」攤還至貸款年限結束。</p>
+        <h4>4. 生活費用與通膨</h4>
+        <p>每一年不論是否退休，「每月基本生活費」與「旅遊基金」都會被通膨率放大。</p>
+        <h4>5. 台灣所得稅計算</h4>
+        <p>依照 113 年度累進稅率：5% / 12% / 20% / 30% / 40%，扣除免稅額、標準扣除額與薪資所得特別扣除額後計算。</p>
+        <h4>6. 目標反向推算器</h4>
+        <p>使用年金終值 (FV) 推算法，估算現有投資滾動至目標年齡後的價值，並計算達到目標所需的每月定期定額投入金額。</p>
+        <h4>7. 財務評分 (滿分 100)</h4>
+        <p>扣分項目：破產風險（最多 80 分）、晚年資產不足（-10~20 分）、退休前赤字年數（最多 -20 分）、緊急預備金不足（-10 分）、高負債比（-5~10 分）。</p>
+      </div>
+    </div>
+
+  </div><!-- /rtab-panels -->
+</main>
+
+</div><!-- /app-layout -->
+
+<!-- JS 模組 -->
+<script src="js/engine.js"></script>
+<script src="js/storage.js"></script>
+<script src="js/charts.js"></script>
+<script src="js/statements.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
