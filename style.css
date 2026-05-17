@@ -35,6 +35,14 @@ html, body {
     font-size: 14px;
     line-height: 1.6;
     overflow: hidden;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+}
+
+input, textarea, select {
+    -webkit-user-select: text;
+    user-select: text;
 }
 
 /* ── Layout ── */
@@ -416,7 +424,7 @@ table.asset-table { width: 100%; border-collapse: collapse; font-size: 13px; }
 
 @media (max-width: 768px) {
     html, body { overflow-x: hidden; overflow-y: auto; background: var(--bg-deep); }
-    .app-layout { flex-direction: column; height: auto; padding-bottom: 80px; overflow: visible; }
+    .app-layout { flex-direction: column; height: auto; padding-bottom: calc(85px + env(safe-area-inset-bottom)); overflow: visible; }
     
     /* 底部導覽列 */
     .mobile-tab-bar {

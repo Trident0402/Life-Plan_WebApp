@@ -2,9 +2,22 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>人生財務規劃模擬器</title>
 <meta name="description" content="終身財務規劃模擬工具，計算資產、房貸、稅務、退休規劃。">
+
+<!-- PWA (去除網址列，支援 Android & iOS 雙平台通用) -->
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="財務規劃">
+<meta name="theme-color" content="#8c9e82">
+
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+
 <link rel="stylesheet" href="style.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
@@ -437,5 +450,16 @@
 <script src="charts.js"></script>
 <script src="statements.js"></script>
 <script src="app.js"></script>
+
+<!-- PWA Service Worker 註冊 -->
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js')
+        .then(reg => console.log('Service Worker Registered Successfully:', reg.scope))
+        .catch(err => console.log('Service Worker Registration Failed:', err));
+    });
+  }
+</script>
 </body>
 </html>
