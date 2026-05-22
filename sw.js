@@ -1,4 +1,4 @@
-const CACHE_NAME = 'financial-planner-v1';
+const CACHE_NAME = 'financial-planner-v5';
 const ASSETS = [
   './',
   './index.html',
@@ -8,11 +8,13 @@ const ASSETS = [
   './engine.js',
   './storage.js',
   './statements.js',
+  './pdf_exporter.js',
+  './chart.umd.min.js',
+  './chartjs-plugin-annotation.min.js',
+  './html2pdf.bundle.min.js',
   './manifest.json',
   './icon-192.png',
-  './icon-512.png',
-  'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js',
-  'https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js'
+  './icon-512.png'
 ];
 
 // Install Service Worker and cache all shell assets

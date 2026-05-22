@@ -229,6 +229,67 @@ function collectParams() {
 //  填充表單
 // ─────────────────────────────────────────────────
 function fillForm(p) {
+    if (!p) return;
+    
+    // Normalize snake_case keys to camelCase keys for compatibility with Python format
+    const normalized = {};
+    const SNAKE_TO_CAMEL = {
+        current_age: 'currentAge',
+        retire_age: 'retirementAge',
+        life_expectancy: 'lifeExpectancy',
+        current_cash: 'currentCash',
+        current_investments: 'currentInvestments',
+        monthly_income: 'monthlyIncome',
+        annual_bonus_months: 'annualBonusMonths',
+        monthly_living_expenses: 'monthlyLivingExpenses',
+        debt_amount: 'debtAmount',
+        debt_rate: 'debtRate',
+        debt_months: 'debtMonths',
+        travel_expenses: 'annualTravelExpenses',
+        invest_ratio: 'investmentRatio',
+        inflation: 'inflationRate',
+        inv_return: 'investmentReturnRate',
+        income_growth: 'incomeGrowthRate',
+        mortgage_start_age: 'mortgageStartAge',
+        mortgage_house_price: 'mortgageHousePrice',
+        mortgage_down_ratio: 'mortgageDownRatio',
+        mortgage_years: 'mortgageYears',
+        mortgage_rate: 'mortgageRate',
+        mortgage_grace_years: 'mortgageGraceYears',
+        mortgage_other_fees: 'mortgageOtherFees',
+        car_start_age: 'carStartAge',
+        car_price: 'carPrice',
+        car_down_ratio: 'carDownRatio',
+        car_loan_years: 'carLoanYears',
+        car_loan_rate: 'carLoanRate',
+        ce1_name: 'ce1Name',
+        ce1_age: 'ce1Age',
+        ce1_amount: 'ce1Amount',
+        ce1_months: 'ce1Months',
+        ce2_name: 'ce2Name',
+        ce2_age: 'ce2Age',
+        ce2_amount: 'ce2Amount',
+        ce2_months: 'ce2Months',
+        tax_exemption: 'taxExemption',
+        tax_standard_deduction: 'taxStdDeduction',
+        tax_salary_deduction: 'taxSalDeduction'
+    };
+
+    for (const key in p) {
+        if (Object.prototype.hasOwnProperty.call(p, key)) {
+            const mappedKey = SNAKE_TO_CAMEL[key] || key;
+            let val = p[key];
+            if (typeof val === 'string' && val !== '' && mappedKey !== 'ce1Name' && mappedKey !== 'ce2Name') {
+                const parsed = Number(val);
+                if (!isNaN(parsed)) {
+                    val = parsed;
+                }
+            }
+            normalized[mappedKey] = val;
+        }
+    }
+    p = normalized;
+
     const setV = (id, v) => { const el = $(id); if (el && v !== undefined) el.value = v; };
     const syncSl = id => {
         const el = $(id); if (!el) return;
@@ -524,6 +585,17 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // PDF Export
+    const handlePDFExport = () => {
+        if (!simResults || simResults.length === 0) {
+            showToast('⚠️ 請先執行財務推算再匯出 PDF！', 'error');
+            return;
+        }
+        exportToPDF(simResults, lastScore, collectParams());
+    };
+    $('btn-pdf').addEventListener('click', handlePDFExport);
+    $('btn-pdf-score').addEventListener('click', handlePDFExport);
+
     // Pie age slider
     $('pie-age-slider').addEventListener('input', e => {
         updatePieAge(parseInt(e.target.value));
@@ -538,5 +610,47 @@ document.addEventListener('DOMContentLoaded', () => {
     $('btn-goal').addEventListener('click', runGoalPlanner);
 
     // Default run on load
+    const defaultScenario = {
+        currentAge: 26,
+        retirementAge: 65,
+        lifeExpectancy: 85,
+        currentCash: 50000,
+        currentInvestments: 200000,
+        monthlyIncome: 68000,
+        annualBonusMonths: 2.0,
+        monthlyLivingExpenses: 29000,
+        debtAmount: 764000,
+        debtRate: 1.8428184281842819,
+        debtMonths: 144,
+        annualTravelExpenses: 96000,
+        investmentRatio: 60.313315926892955,
+        inflationRate: 3.295774647887324,
+        investmentReturnRate: 6.028169014084507,
+        incomeGrowthRate: 2.493638676844784,
+        mortgageStartAge: 35,
+        mortgageHousePrice: 10000000,
+        mortgageDownRatio: 30.05464480874317,
+        mortgageYears: 30,
+        mortgageRate: 2.5,
+        mortgageGraceYears: 3,
+        mortgageOtherFees: 1000000,
+        carStartAge: 0,
+        carPrice: 800000,
+        carDownRatio: 20.0,
+        carLoanYears: 5,
+        carLoanRate: 3.5,
+        ce1Name: "學貸",
+        ce1Age: 27,
+        ce1Amount: 748000,
+        ce1Months: 144,
+        ce2Name: "結婚基金",
+        ce2Age: 0,
+        ce2Amount: 1000000,
+        ce2Months: 24,
+        taxExemption: 101000,
+        taxStdDeduction: 136000,
+        taxSalDeduction: 227000
+    };
+    fillForm(defaultScenario);
     runSimulation();
 });

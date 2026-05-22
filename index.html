@@ -19,8 +19,9 @@
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
 
 <link rel="stylesheet" href="style.css">
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+<script src="chart.umd.min.js"></script>
+<script src="chartjs-plugin-annotation.min.js"></script>
+<script src="html2pdf.bundle.min.js"></script>
 </head>
 <body class="mob-view-input">
 <div class="app-layout">
@@ -47,14 +48,14 @@
     <div class="ptab-panel active" id="ptab-basic">
       <div class="form-card">
         <div class="form-card-title">👤 基本資料</div>
-        <div class="form-row"><label>目前年齡</label><input type="number" id="current-age" value="30" min="1" max="100"></div>
+        <div class="form-row"><label>目前年齡</label><input type="number" id="current-age" value="26" min="1" max="100"></div>
         <div class="form-row"><label>預計退休年齡</label><input type="number" id="retire-age" value="65" min="1" max="100"></div>
         <div class="form-row"><label>預期壽命</label><input type="number" id="life-exp" value="85" min="1" max="120"></div>
       </div>
       <div class="form-card">
         <div class="form-card-title">💼 財務部位現況</div>
-        <div class="form-row"><label>目前現金存款 (元)</label><input type="number" id="current-cash" value="500000"></div>
-        <div class="form-row"><label>目前投資部位 (元)</label><input type="number" id="current-inv" value="100000"></div>
+        <div class="form-row"><label>目前現金存款 (元)</label><input type="number" id="current-cash" value="50000"></div>
+        <div class="form-row"><label>目前投資部位 (元)</label><input type="number" id="current-inv" value="200000"></div>
       </div>
     </div>
 
@@ -62,50 +63,50 @@
     <div class="ptab-panel" id="ptab-cashflow">
       <div class="form-card">
         <div class="form-card-title">💰 收支與成長規劃</div>
-        <div class="form-row"><label>目前月薪 (元)</label><input type="number" id="monthly-income" value="50000"></div>
+        <div class="form-row"><label>目前月薪 (元)</label><input type="number" id="monthly-income" value="68000"></div>
         <div class="form-row"><label>預估年終 (月數)</label><input type="number" id="bonus-months" value="2" step="0.5"></div>
-        <div class="form-row"><label>每月基本生活費</label><input type="number" id="monthly-living" value="25000"></div>
-        <div class="form-row"><label>年度旅遊基金 (元)</label><input type="number" id="travel-exp" value="50000"></div>
+        <div class="form-row"><label>每月基本生活費</label><input type="number" id="monthly-living" value="29000"></div>
+        <div class="form-row"><label>年度旅遊基金 (元)</label><input type="number" id="travel-exp" value="96000"></div>
         <div class="form-row">
           <label>結餘投入投資比例</label>
           <div class="slider-wrap">
-            <input type="range" id="inv-ratio" min="0" max="100" value="60" step="1">
-            <span class="slider-val">60</span><small>%</small>
+            <input type="range" id="inv-ratio" min="0" max="100" value="60.3" step="0.1">
+            <span class="slider-val">60.3</span><small>%</small>
           </div>
         </div>
         <div class="form-row">
           <label>預期通膨率</label>
           <div class="slider-wrap">
-            <input type="range" id="inflation" min="0" max="10" value="2" step="0.1">
-            <span class="slider-val">2</span><small>%</small>
+            <input type="range" id="inflation" min="0" max="10" value="3.3" step="0.1">
+            <span class="slider-val">3.3</span><small>%</small>
           </div>
         </div>
         <div class="form-row">
           <label>預期投資年化報酬率</label>
           <div class="slider-wrap">
-            <input type="range" id="inv-return" min="0" max="20" value="5" step="0.1">
-            <span class="slider-val">5</span><small>%</small>
+            <input type="range" id="inv-return" min="0" max="20" value="6" step="0.1">
+            <span class="slider-val">6</span><small>%</small>
           </div>
         </div>
         <div class="form-row">
           <label>固定年薪成長率</label>
           <div class="slider-wrap">
-            <input type="range" id="income-growth" min="0" max="10" value="3" step="0.1">
-            <span class="slider-val">3</span><small>%</small>
+            <input type="range" id="income-growth" min="0" max="10" value="2.5" step="0.1">
+            <span class="slider-val">2.5</span><small>%</small>
           </div>
         </div>
       </div>
       <div class="form-card">
         <div class="form-card-title">📉 債務規劃 (學貸/信貸)</div>
-        <div class="form-row"><label>負債總額 (元)</label><input type="number" id="debt-amount" value="0"></div>
+        <div class="form-row"><label>負債總額 (元)</label><input type="number" id="debt-amount" value="764000"></div>
         <div class="form-row">
           <label>負債年利率</label>
           <div class="slider-wrap">
-            <input type="range" id="debt-rate" min="0" max="20" value="2.5" step="0.1">
-            <span class="slider-val">2.5</span><small>%</small>
+            <input type="range" id="debt-rate" min="0" max="20" value="1.84" step="0.01">
+            <span class="slider-val">1.84</span><small>%</small>
           </div>
         </div>
-        <div class="form-row"><label>還款期限 (月數)</label><input type="number" id="debt-months" value="0"></div>
+        <div class="form-row"><label>還款期限 (月數)</label><input type="number" id="debt-months" value="144"></div>
       </div>
     </div>
 
@@ -113,25 +114,25 @@
     <div class="ptab-panel" id="ptab-mortgage">
       <div class="form-card">
         <div class="form-card-title">🏡 房貸規劃</div>
-        <div class="form-row"><label>計畫買房年齡 (0=不買)</label><input type="number" id="mortgage-age" value="0"></div>
-        <div class="form-row"><label>房屋總價 (元)</label><input type="number" id="mortgage-price" value="15000000"></div>
+        <div class="form-row"><label>計畫買房年齡 (0=不買)</label><input type="number" id="mortgage-age" value="35"></div>
+        <div class="form-row"><label>房屋總價 (元)</label><input type="number" id="mortgage-price" value="10000000"></div>
         <div class="form-row">
           <label>頭期款成數</label>
           <div class="slider-wrap">
-            <input type="range" id="mortgage-down" min="0" max="100" value="20" step="1">
-            <span class="slider-val">20</span><small>%</small>
+            <input type="range" id="mortgage-down" min="0" max="100" value="30.1" step="0.1">
+            <span class="slider-val">30.1</span><small>%</small>
           </div>
         </div>
         <div class="form-row"><label>貸款總年限 (年)</label><input type="number" id="mortgage-years" value="30"></div>
         <div class="form-row">
           <label>固定房貸利率</label>
           <div class="slider-wrap">
-            <input type="range" id="mortgage-rate" min="0.5" max="10" value="2.1" step="0.05">
-            <span class="slider-val">2.1</span><small>%</small>
+            <input type="range" id="mortgage-rate" min="0.5" max="10" value="2.5" step="0.05">
+            <span class="slider-val">2.5</span><small>%</small>
           </div>
         </div>
-        <div class="form-row"><label>寬限期 (年)</label><input type="number" id="mortgage-grace" value="0"></div>
-        <div class="form-row"><label>裝潢與其他費用 (元)</label><input type="number" id="mortgage-fees" value="0"></div>
+        <div class="form-row"><label>寬限期 (年)</label><input type="number" id="mortgage-grace" value="3"></div>
+        <div class="form-row"><label>裝潢與其他費用 (元)</label><input type="number" id="mortgage-fees" value="1000000"></div>
       </div>
       <div class="form-card">
         <div class="form-card-title">🚗 車貸規劃</div>
@@ -155,14 +156,14 @@
       </div>
       <div class="form-card">
         <div class="form-card-title">🎯 自訂重大消費</div>
-        <div class="form-row"><label>消費1 名稱</label><input type="text" id="ce1-name" value="結婚基金"></div>
-        <div class="form-row"><label>消費1 年齡 (0=無)</label><input type="number" id="ce1-age" value="0"></div>
-        <div class="form-row"><label>消費1 總金額 (元)</label><input type="number" id="ce1-amount" value="500000"></div>
-        <div class="form-row"><label>攤提月數 (0=一次)</label><input type="number" id="ce1-months" value="0"></div>
-        <div class="form-row"><label>消費2 名稱</label><input type="text" id="ce2-name" value="留學/進修"></div>
+        <div class="form-row"><label>消費1 名稱</label><input type="text" id="ce1-name" value="學貸"></div>
+        <div class="form-row"><label>消費1 年齡 (0=無)</label><input type="number" id="ce1-age" value="27"></div>
+        <div class="form-row"><label>消費1 總金額 (元)</label><input type="number" id="ce1-amount" value="748000"></div>
+        <div class="form-row"><label>攤提月數 (0=一次)</label><input type="number" id="ce1-months" value="144"></div>
+        <div class="form-row"><label>消費2 名稱</label><input type="text" id="ce2-name" value="結婚基金"></div>
         <div class="form-row"><label>消費2 年齡 (0=無)</label><input type="number" id="ce2-age" value="0"></div>
         <div class="form-row"><label>消費2 總金額 (元)</label><input type="number" id="ce2-amount" value="1000000"></div>
-        <div class="form-row"><label>攤提月數 (0=一次)</label><input type="number" id="ce2-months" value="0"></div>
+        <div class="form-row"><label>攤提月數 (0=一次)</label><input type="number" id="ce2-months" value="24"></div>
       </div>
     </div>
 
@@ -193,6 +194,7 @@
       <button class="btn btn-outline" id="btn-import">⬇️ 匯入</button>
     </div>
     <button class="btn btn-primary" id="btn-run">🚀 開始終身財務推算</button>
+    <button class="btn btn-success" id="btn-pdf" style="width:100%;">📄 匯出 PDF 報告</button>
   </div>
 </aside>
 
@@ -388,6 +390,7 @@
           <p style="font-size:12px;color:var(--text-muted);text-align:center;line-height:1.6;">
             基於：破產風險、晚年資產、退休前現金流、緊急預備金、負債比
           </p>
+          <button class="btn btn-success" id="btn-pdf-score" style="width:100%;margin-top:10px;">📄 匯出 PDF 報告</button>
         </div>
         <div class="score-detail-card">
           <div class="score-section-title">📋 評估結果</div>
@@ -449,6 +452,7 @@
 <script src="storage.js"></script>
 <script src="charts.js"></script>
 <script src="statements.js"></script>
+<script src="pdf_exporter.js"></script>
 <script src="app.js"></script>
 
 <!-- PWA Service Worker 註冊 -->
